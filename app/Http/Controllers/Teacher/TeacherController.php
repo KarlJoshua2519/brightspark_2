@@ -19,6 +19,35 @@ class TeacherController extends Controller
        
     }
 
+
+    public function Subjects()
+    {
+        
+        return view('/teacher/teacherSubjects');  
+       
+    }
+
+    public function Inbox()
+    {
+        
+        return view('/teacher/teacherInbox');  
+       
+    }
+
+    public function Classes()
+    {
+        
+        return view('/teacher/teacherClasses');  
+       
+    }
+
+    public function Profile()
+    {
+        
+        return view('/teacher/teacherProfile');  
+       
+    }
+
     // public function __construct()
     // {
     //     $this->middleware('guest:teacher')->except('logout');

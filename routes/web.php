@@ -83,6 +83,12 @@ Route::middleware(['auth:teacher', \App\Http\Middleware\DisableBrowserCache::cla
     // Teacher Dashboard Route
     Route::get('/teacher/teacherDashboard', [TeacherController::class, 'dashboard']);
     Route::get('/teacher/teacherStudents', [TeacherController::class, 'students']);
+    Route::get('/teacher/teacherClasses', [TeacherController::class, 'classes']);
+    Route::get('/teacher/teacherProfile', [TeacherController::class, 'profile']);
+    Route::get('/teacher/teacherSubjects', [TeacherController::class, 'subjects']);
+    Route::get('/teacher/teacherInbox', [TeacherController::class, 'inbox']);
+    Route::get('/conversation/{id}', [TeacherController::class, 'show'])->name('conversation');
+
     Route::post('/teacher/logout/', [TeacherController::class, 'logout']);
     
     // Add other routes here that require teacher authentication
