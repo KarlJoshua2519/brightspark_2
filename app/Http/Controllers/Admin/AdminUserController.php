@@ -34,6 +34,64 @@ class AdminUserController extends Controller
     
             return view('auth.adminLogin');
         }
+
+
+
+
+        public function Announcements()
+    {
+        
+        return view('/admin/adminAnnouncement');  
+       
+    }
+
+
+    public function Inbox()
+    {
+        
+        return view('/admin/adminInbox');  
+       
+    }
+
+    public function AccountManagement()
+    {
+        
+        return view('/admin/adminAccountManagement');  
+       
+    }
+
+
+    public function StudentManagement()
+    {
+        
+        return view('/admin/adminStudentManagement');  
+       
+    }
+
+    public function TeacherManagement()
+    {
+        
+        return view('/admin/adminTeacherManagement');  
+       
+    }
+
+
+    
+    public function ClassManagement()
+    {
+        
+        return view('/admin/adminClassManagement');  
+       
+    }
+
+    public function SubjectManagement()
+    {
+        
+        return view('/admin/adminSubjectManagement');  
+       
+    }
+    
+    
     
         // Handle the admin login attempt
         public function login(Request $request)

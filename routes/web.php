@@ -30,11 +30,21 @@ Route::get('/', function () {
 Route::get('/create-admin', [AdminUserController::class, 'createDefaultAdmin']);
 // routes/web.php
 Route::middleware(['web'])->group(function () {
-    // Define your admin routes here
     Route::get('/admin/dashboard', function () {
         return view('admin.adminDashboard');
+        
     });
+    Route::get('/admin/adminSubjectManagement', [AdminUserController::class, 'SubjectManagement']);
+    Route::get('/admin/adminClassManagement', [AdminUserController::class, 'ClassManagement']);
+    Route::get('/admin/adminTeacherManagement', [AdminUserController::class, 'TeacherManagement']);
+    Route::get('/admin/adminStudentManagement', [AdminUserController::class, 'StudentManagement']);
+    Route::get('/admin/adminAccountManagement', [AdminUserController::class, 'AccountManagement']);
+    Route::get('/admin/adminAnnouncement', [AdminUserController::class, 'Announcements']);
+    Route::get('/admin/adminInbox', [AdminUserController::class, 'Inbox']);
     Route::post('/admin/logout/', [AdminUserController::class, 'logout']);
+
+
+    
 });
 
 Route::get('/about', function () {
