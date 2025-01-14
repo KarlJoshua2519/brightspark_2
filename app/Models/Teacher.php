@@ -9,6 +9,18 @@ use Illuminate\Notifications\Notifiable;
 
 class Teacher extends Authenticatable
 {
+
+    public function students()
+{
+    return $this->hasMany(Student::class, 'grade', 'grade');
+}
+
+public function subjects()
+{
+    // Assuming you are linking the teacher’s email in the 'teacher_email' column in the subjects table
+    return $this->hasMany(Subject::class, 'teacher_email', 'email');
+}
+
     use HasFactory, Notifiable;
 
     protected $guard = 'teacher';

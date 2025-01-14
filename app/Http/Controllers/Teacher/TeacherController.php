@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
+use App\Models\Student;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,19 +14,27 @@ class TeacherController extends Controller
 {
 
     public function Students()
-    {
-        
-        return view('/teacher/teacherStudents');  
-       
-    }
+{
+    // Fetch the students related to the logged-in teacher, for example by advisory year and section
+    $teacher = auth()->guard('teacher')->user(); // Get the logged-in teacher
+    $students = Student::where('grade', $teacher->advisory_year)
+                       ->where('section', $teacher->advisory_section)
+                       ->get(); // Fetch students in the teacher's advisory class
+    
+    // Pass the students to the view
+    return view('/teacher/teacherStudents', compact('students'));
+}
 
 
-    public function Subjects()
-    {
-        
-        return view('/teacher/teacherSubjects');  
-       
-    }
+
+public function subjects()
+{
+    // Get the logged-in teacher's subjects
+    $teacher = auth()->user();  // Assuming the teacher is logged in
+    $subjects = $teacher->subjects;  // This assumes the Teacher model has a 'subjects' relationship
+
+    return view('teacher.teacherSubjects', compact('subjects'));
+}
 
     public function Inbox()
     {
@@ -44,67 +53,12 @@ class TeacherController extends Controller
     public function Profile()
     {
         
-        return view('/teacher/teacherProfile');  
+        $teacher = Auth::guard('teacher')->user(); // Get the logged-in teacher
+        return view('teacher/teacherProfile', compact('teacher')); // Pass the teacher to the view
        
     }
 
-    // public function __construct()
-    // {
-    //     $this->middleware('guest:teacher')->except('logout');
-    // }
-
-    // public function showRegistrationForm()
-    // {
-    //     return view('teacher.auth.register');
-    // }
-
-    // public function showLoginForm()
-    // {
-    //     return view('teacher.auth.login');
-    // }
-
-    // protected function guard()
-    // {
-    //     return Auth::guard('teacher'); // Define the guard for teachers
-    // }
-
-    // protected function create(array $data)
-    // {
-    //     return Teacher::create([
-    //         'name' => $data['name'],
-    //         'middleName' => $data['middleName'],
-    //         'lastName' => $data['lastName'],
-    //         'sex' => $data['sex'],
-    //         'birthday' => $data['birthday'],
-    //         'address' => $data['address'],
-    //         'email' => $data['email'],
-    //         'password' => Hash::make($data['password']),
-    //         'contact_number' => $data['contact_number'],
-    //         'contactperson' => $data['contactperson'],
-    //         'contactperson_number' => $data['contactperson_number'],
-    //         'id_number' => $data['id_number'],
-    //         'subject' => $data['subject'],
-    //         'department' => $data['department'],
-    //         'program' => $data['program'],
-    //         'advisory_year' => $data['advisory_year'],
-    //         'advisory_section' => $data['advisory_section'],
-    //         'accountStatus' => 'active', // Default value for accountStatus
-    //     ]);
-    // }
-
-    // public function login(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'email' => 'required|string|email',
-    //         'password' => 'required|string',
-    //     ]);
-
-    //     if (Auth::guard('teacher')->attempt(['email' => $request->input('email'), 'password' => $request->input('password')])) {
-    //         return redirect()->intended(route('teacher.dashboard'));
-    //     }
-
-    //     return redirect()->route('teacher.login')->withErrors(['email' => 'Invalid credentials']);
-    // }
+   
 
     public function logout(Request $request)
     {
@@ -115,13 +69,13 @@ class TeacherController extends Controller
 
     public function dashboard()
     {
-        // Check if a teacher is authenticated
+    
         if (auth()->guard('teacher')->check()) {
-            // Teacher is authenticated, you can access teacher-specific data or perform actions
+          
             $teacher = auth()->guard('teacher')->user();
             return view('/teacher/teacherDashboard', compact('teacher'));
         } else {
-            // Teacher is not authenticated, redirect to the login page
+        
             return redirect('/teacher/login');
         }
     }
@@ -140,7 +94,7 @@ class TeacherController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the registration data, including teacher-specific fields
+    
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'middleName' => 'nullable|string|max:255',
@@ -156,10 +110,10 @@ class TeacherController extends Controller
             'program' => 'required|in:kinder,elementary,high_school',
             'advisory_year' => 'required|integer',
             'advisory_section' => 'required|string|max:255',
-            'subject' => 'required', // Ensure it's an array with a maximum of 5 element // Validation for each subject in the array
+            'subject' => 'required', 
         ]);
 
-        // Create a new user record
+
         $user = Teacher::create([
             'name' => $request->name,
             'middleName' => $request->middleName,
@@ -183,18 +137,49 @@ class TeacherController extends Controller
 
         auth()->login($user);
 
-        // Attach subjects to the teacher
-        // $teacher->subjects()->attach($request->input('subjects'));
-
-            // Redirect to a success page or do any additional tasks
+       
         return view('auth/teacherLogin')->with('success', 'Teacher registration successful!');
     }
 
 
-    //LOGIN
+    public function update(Request $request, $id)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'middleName' => 'nullable|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contact_number' => 'required|string|max:15',
+            'address' => 'nullable|string|max:255',
+            'department' => 'required|string|max:255',
+            'program' => 'nullable|string|max:255',
+            'subject' => 'nullable|string|max:255',
+        ]);
+
+        // Find the teacher by ID and update their details
+        $teacher = Teacher::findOrFail($id);
+        $teacher->update([
+            'name' => $request->name,
+            'middleName' => $request->middleName,
+            'lastName' => $request->lastName,
+            'email' => $request->email,
+            'contact_number' => $request->contact_number,
+            'address' => $request->address,
+            'department' => $request->department,
+            'program' => $request->program,
+            'subject' => json_encode(explode(',', $request->subject)),
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->route('teacher.profile', $teacher->id)
+                         ->with('success', 'Profile updated successfully.');
+    }
+
+    
     public function showLoginForm()
     {
-        // return view('auth/teacherLogin');
+       
 
         if (auth()->guard('teacher')->check()){
             return redirect('teacher/teacherDashboard');
@@ -207,13 +192,13 @@ class TeacherController extends Controller
 
     public function login(Request $request)
     {
-        // Validate the login data
+      
         $this->validate($request, [
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        // Attempt to authenticate the teacher
+    
         if (Auth::guard('teacher')->attempt(['email' => $request->email, 'password' => $request->password])) {
             // Authentication successful, redirect to the teacher's dashboard or another page
             $user = Auth::guard('teacher')->user();
@@ -223,18 +208,10 @@ class TeacherController extends Controller
             ]);
         }
 
-        // Authentication failed, redirect back with errors
+     
         return back()->withErrors(['email' => 'Invalid login credentials']);
     }
 
-    // public function dashboard(){
-    //     return view('teacher/teacherDashboard');
-    // }
-
-    // public function logout()
-    // {
-    //     auth()->logout();
-    // }
-
+  
 
 }

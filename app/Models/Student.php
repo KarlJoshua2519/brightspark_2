@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 class Student extends Authenticatable
 {
+
+    // In Student model
+public function teacher()
+{
+    return $this->belongsTo(Teacher::class, 'grade', 'grade');
+}
     use HasFactory, Notifiable;
 
     protected $guard = 'student';
@@ -29,7 +34,7 @@ class Student extends Authenticatable
         'grade',
         'section',
         'lrn',
-
+        'profile_picture', // Added profile_picture to the fillable fields
     ];
 
     protected $hidden = [

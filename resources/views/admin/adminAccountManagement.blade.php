@@ -51,38 +51,29 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="border-t">
-                        <td class="px-4 py-2 text-sm text-gray-800">John Doe</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">johndoe@example.com</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">Teacher</td>
-                        <td class="px-4 py-2 text-sm">
-                            <span class="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Active</span>
-                        </td>
-                        <td class="px-4 py-2 text-center"> 
-                            <button class="text-red-500 hover:text-red-600 ml-3" data-toggle="modal" data-target="#deactivateUserModal">
-                                <i class="fas fa-ban"></i> Deactivate
-                            </button> 
-                        </td>
-                    </tr>
+                    @foreach($users as $user)
+                        <tr class="border-t">
+                            <td class="px-4 py-2 text-sm text-gray-800">{{ $user->name }}</td>
+                            <td class="px-4 py-2 text-sm text-gray-600">{{ $user->email }}</td>
+                            <td class="px-4 py-2 text-sm text-gray-600">{{ class_basename($user) }}</td>
+                            <td class="px-4 py-2 text-sm">
+                                <span class="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">
+                                    {{ $user->status ?? 'Active' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <button class="text-red-500 hover:text-red-600 ml-3" data-toggle="modal" data-target="#deactivateUserModal">
+                                    <i class="fas fa-ban"></i> Deactivate
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
+        
 
-        <div class="flex justify-center mt-6">
-            <nav>
-                <ul class="flex space-x-2">
-                    <li>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">1</button>
-                    </li>
-                    <li>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">2</button>
-                    </li>
-                    <li>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">3</button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+     
     </div>
 </div>
 
@@ -124,6 +115,5 @@
         </div>
     </div>
 </div>
-
 
 @endsection

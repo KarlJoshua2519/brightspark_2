@@ -6,18 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
 
-
     public function Profile()
     {
-       
-        return view('/student/studentProfile');  
-       
+        // Get the currently authenticated student
+        $student = auth()->guard('student')->user();
+    
+        // Pass the student data to the view
+        return view('/student/studentProfile', compact('student'));
     }
+    
 
 
     public function Subjects()
@@ -180,6 +184,83 @@ class StudentController extends Controller
         // Redirect to a success page or do any additional tasks
         return view('auth/studentLogin')->with('success', 'Student registration successful!');
     }
+
+
+
+    public function updateProfilePicture(Request $request)
+    {
+        // Validate the uploaded file
+        $validatedData = $request->validate([
+            'profile_picture' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048', // Validate image type and size (2MB max)
+        ]);
+    
+        // Get the currently authenticated student
+        $student = auth()->guard('student')->user();
+    
+        // Check if the student is authenticated and exists
+        if (!$student) {
+            return redirect()->route('student.login')->with('error', 'Student not found or not authenticated.');
+        }
+    
+        // Check if a file is uploaded for the profile picture
+        if ($request->hasFile('profile_picture')) {
+            // If the student already has a profile picture, delete the old one
+            if ($student->profile_picture) {
+                Storage::delete('public/' . $student->profile_picture);
+            }
+    
+            // Store the new file in the 'public/profile_pictures' directory
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+    
+            // Update the student's profile picture in the database
+            $student->profile_picture = $path;
+            
+            // Save the changes to the database
+            $student->save(); // This should work now because $student is an Eloquent model instance
+        }
+    
+        // Redirect back to the profile page with a success message
+        return back()->with('success', 'Profile picture updated successfully!');
+    }
+    
+
+
+    public function updateProfile(Request $request)
+{
+    // Get the currently authenticated student
+    $student = auth()->guard('student')->user();
+
+    // Validate the data
+    $request->validate([
+        'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // Optional, only if file is uploaded
+        'name' => 'required|string|max:255',
+        'lastName' => 'required|string|max:255',
+        'contact_number' => 'required|numeric',
+    ]);
+
+    // If a new profile picture is uploaded, handle the file upload
+    if ($request->hasFile('profile_picture')) {
+        // Delete the old profile picture if it exists
+        if ($student->profile_picture) {
+            Storage::delete('public/' . $student->profile_picture);
+        }
+
+        // Store the new profile picture
+        $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+        $student->profile_picture = $path;
+    }
+
+    // Update the student's details
+    $student->name = $request->name;
+    $student->lastName = $request->lastName;
+    $student->contact_number = $request->contact_number;
+
+    // Save the updated student record
+    $student->save();
+
+    // Redirect back with a success message
+    return redirect()->route('student.profile')->with('success', 'Profile updated successfully!');
+}
 
 
     //STUDENT LOGIN

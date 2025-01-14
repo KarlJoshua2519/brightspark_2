@@ -19,63 +19,50 @@
 
         <!-- Subject Cards List -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Subject Card Example -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
-                <div class="bg-gray-200 p-4 text-center">
-                    <h2 class="text-xl font-semibold text-gray-800">Mathematics</h2>
-                    <p class="mt-2 text-sm text-gray-600">Grade 10</p>
-                </div>
-                <div class="p-4">
-                    <p><strong>Teacher:</strong> John Doe</p>
-                    <p><strong>Code:</strong> MATH101</p>
-                    <div class="mt-4 flex justify-between">
-                        <button class="text-yellow-600 hover:text-yellow-700 flex items-center space-x-2" onclick="editSubject(1)">
-                            <i class="fas fa-edit"></i><span>Edit</span>
-                        </button>
-                        <button class="text-red-600 hover:text-red-700 flex items-center space-x-2" onclick="deleteSubject(1)">
-                            <i class="fas fa-trash-alt"></i><span>Delete</span>
-                        </button>
+            @foreach($subjects as $subject)
+                <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
+                    <div class="bg-gray-200 p-4 text-center">
+                        <h2 class="text-xl font-semibold text-gray-800">{{ $subject->name }}</h2>
+                        <p class="mt-2 text-sm text-gray-600">{{ $subject->grade }}</p>
+                    </div>
+                    <div class="p-4">
+                        <p><strong>Teacher:</strong> {{ $subject->teacher }}</p>
+                        <p><strong>Code:</strong> {{ $subject->code }}</p>
+                        <div class="mt-4 flex justify-between">
+                            <button class="text-yellow-600 hover:text-yellow-700 flex items-center space-x-2" onclick="editSubject({{ $subject->id }})">
+                                <i class="fas fa-edit"></i><span>Edit</span>
+                            </button>
+                            <button class="text-red-600 hover:text-red-700 flex items-center space-x-2" onclick="deleteSubject({{ $subject->id }})">
+                                <i class="fas fa-trash-alt"></i><span>Delete</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Another Subject Card Example -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
-                <div class="bg-gray-200 p-4 text-center">
-                    <h2 class="text-xl font-semibold text-gray-800">English</h2>
-                    <p class="mt-2 text-sm text-gray-600">Grade 11</p>
-                </div>
-                <div class="p-4">
-                    <p><strong>Teacher:</strong> Jane Smith</p>
-                    <p><strong>Code:</strong> ENG102</p>
-                    <div class="mt-4 flex justify-between">
-                        <button class="text-yellow-600 hover:text-yellow-700 flex items-center space-x-2" onclick="editSubject(2)">
-                            <i class="fas fa-edit"></i><span>Edit</span>
-                        </button>
-                        <button class="text-red-600 hover:text-red-700 flex items-center space-x-2" onclick="deleteSubject(2)">
-                            <i class="fas fa-trash-alt"></i><span>Delete</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
 
 <!-- Modal for Adding or Editing Subject -->
-<div id="subjectModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 hidden justify-center items-center">
+<div id="subjectModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex flex-col w-full hidden justify-center items-center">
     <div class="bg-white p-6 rounded-lg shadow-md w-96">
         <h2 class="text-2xl font-semibold mb-4 text-gray-800">Add / Edit Subject</h2>
         
-        <form id="subjectForm">
+        <form action="{{ route('admin.subjects.store') }}" method="POST" id="subjectForm">
+             @csrf
             <div class="mb-4">
                 <label for="subjectName" class="block text-gray-700">Subject Name</label>
                 <input type="text" id="subjectName" name="subjectName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
             </div>
 
             <div class="mb-4">
-                <label for="subjectTeacher" class="block text-gray-700">Assign Teacher</label>
-                <input type="text" id="subjectTeacher" name="subjectTeacher" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                <label for="subjectTeacherName" class="block text-gray-700">Assign Teacher</label>
+                <input type="text" id="subjectTeacherName" name="subjectTeacherName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            </div>
+
+            <div class="mb-4">
+                <label for="subjectTeacherEmail" class="block text-gray-700">Email Teacher</label>
+                <input type="text" id="subjectTeacherEmail" name="subjectTeacherEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
             </div>
 
             <div class="mb-4">
@@ -86,9 +73,9 @@
             <div class="mb-4">
                 <label for="subjectGrade" class="block text-gray-700">Grade Level</label>
                 <select id="subjectGrade" name="subjectGrade" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    <option value="Grade 10">Grade 10</option>
-                    <option value="Grade 11">Grade 11</option>
-                    <option value="Grade 12">Grade 12</option>
+                    <option value="Grade 1">Grade 1</option>
+                    <option value="Grade 2">Grade 2</option>
+                    <option value="Grade 3">Grade 3</option>
                 </select>
             </div>
 
@@ -107,48 +94,74 @@ document.getElementById('addSubjectButton').addEventListener('click', function()
     document.getElementById('subjectForm').reset();
 });
 
-
 document.getElementById('closeModalButton').addEventListener('click', function() {
     document.getElementById('subjectModal').classList.add('hidden');
 });
 
-
-document.getElementById('subjectForm').addEventListener('submit', function(event) {
+// Delete subject
+function deleteSubject(id) {
+    if (confirm('Are you sure you want to delete this subject?')) {
+        fetch(`/admin/subjects/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Subject deleted successfully!');
+                location.reload(); // Refresh to remove the deleted subject from the list
+            } else {
+                alert('Error deleting subject.');
+            }
+        });
+    }
+}
+document.getElementById('subjectForm').addEventListener('submit', async function(event) {
     event.preventDefault();
-    
+
     const subjectName = document.getElementById('subjectName').value;
-    const subjectTeacher = document.getElementById('subjectTeacher').value;
+    const teacherEmail = document.getElementById('subjectTeacherEmail').value;
     const subjectCode = document.getElementById('subjectCode').value;
     const subjectGrade = document.getElementById('subjectGrade').value;
-    console.log('Subject Name:', subjectName);
-    console.log('Teacher:', subjectTeacher);
-    console.log('Subject Code:', subjectCode);
-    console.log('Grade Level:', subjectGrade);
-    document.getElementById('subjectModal').classList.add('hidden');
-    
 
-    alert('Subject added/updated successfully!');
+    if (!subjectName || !teacherEmail || !subjectCode || !subjectGrade) {
+        alert('All fields are required.');
+        return;
+    }
+
+    try {
+        const response = await fetch('{{ route('admin.subjects.store') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                subjectName: subjectName,
+                subjectTeacherEmail: teacherEmail,
+                subjectCode: subjectCode,
+                subjectGrade: subjectGrade
+            })
+        });
+
+        const result = await response.json();
+        console.log(response);  // Log response for debugging
+        console.log(result);  // Log result for debugging
+
+        if (response.ok) {
+            alert(result.success);
+            location.reload(); // Refresh to show the new subject
+        } else {
+            alert('Error: ' + (result.message || result.error || 'Something went wrong.'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to add or assign subject.');
+    }
 });
 
 
-function editSubject(subjectId) {
-
-    const subjectData = subjectId === 1 ? { name: 'Mathematics', teacher: 'John Doe', code: 'MATH101', grade: 'Grade 10' } : { name: 'English', teacher: 'Jane Smith', code: 'ENG102', grade: 'Grade 11' };
-
-    document.getElementById('subjectName').value = subjectData.name;
-    document.getElementById('subjectTeacher').value = subjectData.teacher;
-    document.getElementById('subjectCode').value = subjectData.code;
-    document.getElementById('subjectGrade').value = subjectData.grade;
-    document.getElementById('subjectModal').classList.remove('hidden');
-}
-
-function deleteSubject(subjectId) {
-    const confirmed = confirm('Are you sure you want to delete this subject?');
-    if (confirmed) {
-        console.log('Subject deleted:', subjectId);
-        alert('Subject deleted successfully!');
-    }
-}
 </script>
 
 @endsection
